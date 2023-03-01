@@ -22,53 +22,8 @@ with open("hhh.json", "w", encoding="UTF-8") as f:
 with open("hhh.json", "r", encoding="UTF-8") as f:
     g = json.load(f)
 
-html = '''
-<html>
 
-    <head>
-
-    <style>
-        html {
-            color: white;
-            background-image: url("https://phonoteka.org/uploads/posts/2021-05/1620203343_9-phonoteka_org-p-fon-dlya-zuma-tyurma-11.png");
-        }
-        p{
-            font-size: 2em;
-        }
-
-    </style>
-    </head>
-    <body>
-      <form action = "http://localhost:5000/out" method = "post">
-         <p>Введите имя преступника!:</p>
-         <p><input type = "text" name = "item" /></p>
-         <p><input type = "submit" value = "Найти гниду" /></p>
-      </form>   
-   </body>
-</html>
-'''
-
-html1 = '''
-<html>
-
-    <head>
-
-    <style>
-        html {
-            color: white;
-            background-image: url("https://phonoteka.org/uploads/posts/2021-05/1620203343_9-phonoteka_org-p-fon-dlya-zuma-tyurma-11.png");
-        }
-        p{
-            font-size: 2em;
-        }
-
-    </style>
-    </head>
-    <h1>Гнида Обнаружена</h1>
-</html>
-'''
-
-from flask import Flask
+from flask import Flask, render_template
 from flask import redirect, url_for, request
 
 app = Flask(__name__)
@@ -76,22 +31,26 @@ app = Flask(__name__)
 
 @app.route("/", methods=['POST', 'GET'])
 def lcpd():
-    return html
+    return render_template("main.html")
 
 
 @app.route("/out", methods=['POST', 'GET'])
 def output():
     if request.method == 'POST':
         item = request.form['item']
+        # тут нужно проверить, есть ли наше имя в списке
+        if item in g:
+            return render_template('main1.html') + f'''
+            <br>Имя:      {g[item]['name']}</br> 
+            <br>Возраст:  {g[item]['age']}  </br>
+            <br>Город:    {g[item]['city']} </br>
+            '''
+        else:
+            return render_template('main.html')
 
-        return html1 + f'''
-        <br>Имя:      {g[item]['name']}</br> 
-        <br>Возраст:  {g[item]['age']}  </br>
-        <br>Город:    {g[item]['city']} </br>
-        '''
 
-
-app.run()
+if __name__ == '__main__':
+    app.run(debug = True)
 
 
 
